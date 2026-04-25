@@ -44,4 +44,11 @@ public class MeetingService {
         transaction.commit();
     }
 
+    //aktualizowanie spotkania
+    public void update(Meeting meeting) {
+        Transaction transaction = connector.getSession().beginTransaction();
+        connector.getSession().merge(meeting);
+        transaction.commit();
+    }
+
 }

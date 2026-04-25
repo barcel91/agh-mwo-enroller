@@ -48,7 +48,7 @@ public class MeetingRestcontroller {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    //Usuwanie uczestników
+    //Usuwanie spotkań
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteMeeting(@PathVariable("id") long meeting_id) {
         Meeting meeting = meetingService.findByMeetingId(meeting_id);
@@ -57,6 +57,17 @@ public class MeetingRestcontroller {
         }
         meetingService.delete(meeting);
         return new ResponseEntity<Meeting>(meeting, HttpStatus.OK);
+    }
+
+    //Aktualizowanie spotkań
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateMeeting(@PathVariable("id") long id, @RequestBody Meeting meeting) {
+        Meeting foundMeeting = meetingService.findByMeetingId(id);
+        if (foundMeeting == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        meetingService.update(meeting);
+        return new ResponseEntity<Meeting>(foundMeeting, HttpStatus.OK);
     }
 
 
