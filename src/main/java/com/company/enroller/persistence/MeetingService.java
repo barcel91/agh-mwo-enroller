@@ -51,4 +51,36 @@ public class MeetingService {
         transaction.commit();
     }
 
+    //Poniżej wymagania na 4.0
+    //Wyświetlanie wszystkich spotkań ASC
+    public Collection<Meeting> getAllASC() {
+        String hql = "FROM Meeting ORDER BY title ASC";
+        Query query = connector.getSession().createQuery(hql);
+
+        return query.list();
+    }
+
+    //Wyświetlanie wszystkich spotkań DESC
+    public Collection<Meeting> getAllDESC() {
+
+        String hql = "FROM Meeting ORDER BY title DESC";
+
+        Query query = connector.getSession().createQuery(hql);
+
+        return query.list();
+    }
+
+    //Wyświatlanie po kluczu
+    public Collection<Meeting> getMeetingsByKey(String key) {
+
+        String hql =
+                "FROM Meeting WHERE title LIKE :key";
+
+        Query query = connector.getSession().createQuery(hql);
+
+        query.setParameter("key", "%" + key + "%");
+
+        return query.list();
+    }
+
 }

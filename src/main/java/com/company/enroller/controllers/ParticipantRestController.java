@@ -18,12 +18,43 @@ public class ParticipantRestController {
 	ParticipantService participantService;
 
     //Pobieranie listy wszystkich uczestników
-	@RequestMapping(value = "", method = RequestMethod.GET)
-	public ResponseEntity<?> getParticipants() {
-		Collection<Participant> participants = participantService.getAll();
-		return new ResponseEntity<Collection<Participant>>(participants, HttpStatus.OK);
-	}
-    // Pobieranie listy pojedyncznego uczestnika
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public ResponseEntity<?> getParticipants(
+
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder,
+            @RequestParam(required = false) String key) {
+
+        Collection<Participant> participants;
+
+        //filtrowanie po loginie
+        if (key != null) {
+            participants = participantService.getParticipantsByKey(key);
+        }
+
+        //sortowanie ASC
+        else if ("login".equals(sortBy)
+                && "ASC".equalsIgnoreCase(sortOrder)) {
+            participants = participantService.getAllASC();
+        }
+
+        //sortowanie DESC
+        else if ("login".equals(sortBy)
+                && "DESC".equalsIgnoreCase(sortOrder)) {
+            participants = participantService.getAllDESC();
+        }
+
+        //zwykła lista
+        else {
+
+            participants = participantService.getAll();
+        }
+
+        return new ResponseEntity<Collection<Participant>>(
+                participants,
+                HttpStatus.OK);
+    }
+    //Pobieranie listy pojedyncznego uczestnika
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<?> getParticipant(@PathVariable("id") String login) {
         Participant participant = participantService.findByLogin(login);
@@ -32,7 +63,7 @@ public class ParticipantRestController {
         }
         return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
-    //Dodawanie  uczestników
+    //Dodawanie  uczestnika
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> registerParticipant(@RequestBody Participant participant){
         Participant foundParticipant = participantService.findByLogin(participant.getLogin());
@@ -43,7 +74,7 @@ public class ParticipantRestController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    //Usuwanie uczestników
+    //Kasowanie uczestnika
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteParticipant(@PathVariable("id") String login) {
         Participant participant = participantService.findByLogin(login);
@@ -54,7 +85,7 @@ public class ParticipantRestController {
         return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
 
-    //Aktualizowanie uczestników
+    //Aktualizowanie uczestnika
     @RequestMapping(value = "/{login}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateParticipant(@PathVariable("login") String login, @RequestBody Participant participant) {
         Participant foundParticipant = participantService.findByLogin(login);

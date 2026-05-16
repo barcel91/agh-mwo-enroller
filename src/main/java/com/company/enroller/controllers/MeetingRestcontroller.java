@@ -22,9 +22,39 @@ public class MeetingRestcontroller {
 
     //Pobieranie listy wszystkich Spotkań
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<?> Meetings() {
-        Collection<Meeting> meetings = meetingService.getAll();
-        return new ResponseEntity<Collection<Meeting>>(meetings, HttpStatus.OK);
+    public ResponseEntity<?> Meetings(
+
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder,
+            @RequestParam(required = false) String key) {
+
+        Collection<Meeting> meetings;
+
+        //filtrowanie
+        if (key != null) {
+            meetings = meetingService.getMeetingsByKey(key);
+        }
+
+        //sortowanie ASC
+        else if ("title".equals(sortBy)
+                && "ASC".equalsIgnoreCase(sortOrder)) {
+            meetings = meetingService.getAllASC();
+        }
+
+        //sortowanie DESC
+        else if ("title".equals(sortBy)
+                && "DESC".equalsIgnoreCase(sortOrder)) {
+            meetings = meetingService.getAllDESC();
+        }
+
+        //zwykła lista
+        else {
+            meetings = meetingService.getAll();
+        }
+
+        return new ResponseEntity<Collection<Meeting>>(
+                meetings,
+                HttpStatus.OK);
     }
 
     // Pobieranie listy pojedyncznego spotkania
@@ -60,7 +90,7 @@ public class MeetingRestcontroller {
     }
 
     //Aktualizowanie spotkań
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+        @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateMeeting(@PathVariable("id") long id, @RequestBody Meeting meeting) {
         Meeting foundMeeting = meetingService.findByMeetingId(id);
         if (foundMeeting == null) {
@@ -69,6 +99,5 @@ public class MeetingRestcontroller {
         meetingService.update(meeting);
         return new ResponseEntity<Meeting>(foundMeeting, HttpStatus.OK);
     }
-
 
 }
